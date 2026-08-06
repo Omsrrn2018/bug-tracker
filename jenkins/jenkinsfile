@@ -7,9 +7,9 @@ pipeline {
     sh 'echo $DOCKER_HOST'
   }
 }
-       stage('Unit Tests - Backend') {
+      stage('Unit Tests - Backend') {
   environment {
-    DOCKER_HOST = ''
+    DOCKER_HOST = 'unix:///var/run/docker.sock'
   }
   agent {
     docker {
