@@ -2,6 +2,11 @@ pipeline {
     agent any
 
     stages {
+        stage('Check Docker Host') {
+  steps {
+    sh 'echo $DOCKER_HOST'
+  }
+}
         stage('Unit Tests - Backend') {
             agent{
                 docker{
