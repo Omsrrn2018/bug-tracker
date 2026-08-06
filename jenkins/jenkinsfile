@@ -7,18 +7,21 @@ pipeline {
     sh 'echo $DOCKER_HOST'
   }
 }
-        stage('Unit Tests - Backend') {
-            agent{
-                docker{
-                    image 'snakee/golang-junit:1.21'
-                    reuseNode true
-                }
-            }
-            steps {
-                dir('bugtracker-backend'){
-                   sh 'go test -v ./...'
-                }
-            }
-        }
+       stage('Unit Tests - Backend') {
+  environment {
+    DOCKER_HOST = ''
+  }
+  agent {
+    docker {
+      image 'snakee/golang-junit:1.21'
+      reuseNode true
+    }
+  }
+  steps {
+    dir('bugtracker-backend') {
+      sh 'go test -v ./...'
+    }
+  }
+}
     }
 }
