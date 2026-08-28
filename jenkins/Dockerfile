@@ -2,13 +2,9 @@ FROM jenkins/jenkins:lts
 
 USER root
 
-# Install dependencies for Docker install script
-RUN apt-get update && apt-get install -y curl
-
-# Install Docker CLI using official convenience script
-RUN curl -fsSL https://get.docker.com -o get-docker.sh && \
-    sh get-docker.sh --dry-run && \
-    sh get-docker.sh && \
-    rm get-docker.sh
+RUN apt-get update && apt-get install -y curl && \
+    curl -L https://download.docker.com/linux/static/stable/x86_64/docker-20.10.24.tgz -o docker.tgz && \
+    tar -xzf docker.tgz --strip 1 -C /usr/local/bin docker/docker && \
+    rm docker.tgz
 
 USER jenkins
