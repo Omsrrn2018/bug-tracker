@@ -10,7 +10,7 @@ pipeline {
           branches: [[name: '*/main']], 
           userRemoteConfigs: [[url: 'https://github.com/Omsrrn2018/bug-tracker.git']]
         ])
-        sh 'ls -la'
+        sh 'find . -type d -or -type f'
       }
     }
     stage('Unit Tests Backend') {
