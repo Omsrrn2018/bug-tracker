@@ -10,8 +10,8 @@ pipeline {
           branches: [[name: '*/main']], 
           userRemoteConfigs: [[url: 'https://github.com/Omsrrn2018/bug-tracker.git']]
         ])
-        sh 'git clone https://github.com/Omsrrn2018/bug-tracker.git'
         sh 'ls -la'
+        sh 'ls -la bug-tracker-backend'
       }
     }
     stage('Unit Tests Backend') {
