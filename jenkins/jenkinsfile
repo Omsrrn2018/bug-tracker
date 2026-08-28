@@ -10,7 +10,7 @@ pipeline {
           branches: [[name: '*/main']], 
           userRemoteConfigs: [[url: 'https://github.com/Omsrrn2018/bug-tracker.git']]
         ])
-        sh 'find . -type d -or -type f'
+        sh 'ls -la'
       }
     }
     stage('Unit Tests Backend') {
@@ -21,11 +21,7 @@ pipeline {
         }
       }
       steps {
-        // Adjust this dir() once we know the correct folder name
-        dir('') {
-          sh 'ls -la'
-          sh 'go test ./...'
-        }
+        sh 'go test ./...'
       }
     }
   }
