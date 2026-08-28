@@ -21,6 +21,7 @@ pipeline {
       }
       steps {
         dir('bug-tracker-backend') {
+          sh 'ls -la'
           sh 'go test ./...'
         }
       }
