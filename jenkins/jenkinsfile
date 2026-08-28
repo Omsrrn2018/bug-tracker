@@ -17,6 +17,7 @@ pipeline {
       agent {
         docker {
           image 'snakee/golang-junit:1.21'
+          args '-w /var/jenkins_home/workspace/bugtrackker'
           reuseNode true
         }
       }
