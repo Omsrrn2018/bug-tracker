@@ -22,6 +22,7 @@ pipeline {
         }
       }
       steps {
+        sh 'ls -la'
         sh 'go test ./...'
       }
     }
