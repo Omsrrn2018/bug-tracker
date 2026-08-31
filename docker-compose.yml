@@ -1,42 +1,23 @@
-networks:
-  bugtracker:
-    driver: bridge
+version: '3.8'
 
 services:
-  frontend:
-    build:
-      context: ./bugtracker-frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
-    depends_on:
-      backend:
-        condition: service_healthy
-    networks:
-      - bugtracker
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:3000"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  backend:
-    build:
-      context: ./bugtracker-backend
+  jenkins:
+    image: jenkins/jenkins:lts
     ports:
       - "8080:8080"
+      - "50000:50000"
     volumes:
-      - ./data:/app/data
-    networks:
-      - bugtracker
-    healthcheck:
-      test: ["CMD", "wget", "-O", "-", "http://localhost:8080/api/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+
+  backend-test:
+    image: snakee/golang-junit:1.21
+    working_dir: /app
+    volumes:
+      - ./bug-tracker-backend:/app
+    command: ["go", "test", "./..."]
+
+volumes:
+  jenkins_home:
