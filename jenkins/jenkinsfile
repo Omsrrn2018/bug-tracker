@@ -4,26 +4,33 @@ pipeline {
     DOCKER_HOST = 'unix:///var/run/docker.sock'
   }
   stages {
+    stage('Clean Workspace') {
+      steps {
+        cleanWs()  // Cleans the workspace before checkout
+      }
+    }
     stage('Checkout') {
       steps {
         checkout([$class: 'GitSCM', 
           branches: [[name: '*/main']], 
           userRemoteConfigs: [[url: 'https://github.com/Omsrrn2018/bug-tracker.git']]
         ])
-        sh 'ls -la'
+        sh 'pwd'    // Print current directory
+        sh 'ls -R'  // Recursive listing to show full repo structure
       }
     }
     stage('Unit Tests Backend') {
       agent {
         docker {
           image 'snakee/golang-junit:1.21'
-          args '-w /var/jenkins_home/workspace/bugtrackker'
           reuseNode true
         }
       }
       steps {
-        sh 'ls -la'
-        sh 'go test ./...'
+        dir('bugtracker-backend') {
+          sh 'ls -la'
+          sh 'go test ./...'
+        }
       }
     }
   }
