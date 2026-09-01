@@ -24,7 +24,7 @@ pipeline {
         docker {
           image 'snakee/golang-junit:1.21'
           reuseNode true
-          args '-v /c/Users/bugtracker/bug-tracker/bugtracker-backend:/app'// Replace with your local backend path
+          args '-v /c/Users/bugtracker/bug-tracker/bugtracker-backend:/app' // Replace with your local backend path
         }
       }
       steps {
@@ -50,7 +50,7 @@ pipeline {
         dir('bugtracker-frontend'){
           sh '''
             npm ci
-            npm test
+            npm run test:detectLeaks
           '''
         }
       }
