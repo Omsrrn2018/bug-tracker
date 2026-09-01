@@ -24,18 +24,15 @@ pipeline {
         docker {
           image 'snakee/golang-junit:1.21'
           reuseNode true
-          args '-v /c/Users/bugtracker/bug-tracker/bugtracker-backend:/app'// Replace with your local backend path
         }
       }
       steps {
         dir('bugtracker-backend') {
           sh 'ls -la'
           sh '''
-            go test -v ./... -coverprofile=coverage.out | tee result.log | go-junit-report > report.xml
-            go tool cover -html=coverage.out -o coverage.html
+            go test -v ./... | tee result.log | go-junit-report > report.xml
           '''
           junit 'report.xml'
-          archiveArtifacts artifacts: 'coverage.out, coverage.html', fingerprint: true
         }
       }
     }
@@ -48,16 +45,15 @@ pipeline {
       }
       steps{
         dir('bugtracker-frontend'){
-          sh '''
-            npm ci
-            npm test
+          sh'''
+          npm ci
+          npm test
           '''
         }
       }
       post {
         always{
-          junit 'bugtracker-frontend/test-results.xml'
-          archiveArtifacts 'bugtracker-frontend/coverage/**'
+         junit 'bugtracker-frontend/test-results.xml'
         }
       }
     }
