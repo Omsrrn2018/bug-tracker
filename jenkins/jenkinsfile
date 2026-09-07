@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        BACKEND_IMAGE = 'your-backend-image:latest'
-        FRONTEND_IMAGE = 'node:20-alpine' // as per your frontend Node.js environment
+        BACKEND_IMAGE = 'snakee/golang-junit:1.21'
+        FRONTEND_IMAGE = 'node:20-alpine'
     }
 
     stages {
@@ -17,14 +17,16 @@ pipeline {
             steps {
                 script {
                     docker.image(BACKEND_IMAGE).inside {
-                        sh 'go test -v ./... -coverprofile=coverage.out'
-                        sh 'go tool cover -html=coverage.out -o coverage.html'
+                        sh '''
+                            go test -v ./... -coverprofile=coverage.out | tee result.log | go-junit-report > test-results.xml
+                            go tool cover -html=coverage.out -o coverage.html
+                        '''
                     }
                 }
             }
             post {
                 always {
-                    junit '**/test-results.xml' // adjust path if needed
+                    junit 'test-results.xml'
                     publishHTML(target: [
                         allowMissing: false,
                         alwaysLinkToLastBuild: true,
@@ -41,14 +43,16 @@ pipeline {
             steps {
                 script {
                     docker.image(FRONTEND_IMAGE).inside {
-                        sh 'npm install'
-                        sh 'npm test -- --coverage'
+                        sh '''
+                            npm install
+                            npm test -- --coverage
+                        '''
                     }
                 }
             }
             post {
                 always {
-                    junit 'test-results.xml' // adjust path if your frontend test results are here
+                    junit 'test-results.xml'
                     publishHTML(target: [
                         allowMissing: false,
                         alwaysLinkToLastBuild: true,
@@ -65,6 +69,4 @@ pipeline {
     post {
         always {
             cleanWs()
-        }
-    }
-}
+       
