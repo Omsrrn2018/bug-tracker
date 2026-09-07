@@ -1,0 +1,65 @@
+pipeline {
+  agent any
+  environment {
+    DOCKER_HOST = 'unix:///var/run/docker.sock'
+  }
+  stages {
+    stage('Clean Workspace') {
+      steps {
+        cleanWs()  // Cleans the workspace before checkout
+      }
+    }
+    stage('Checkout') {
+      steps {
+        checkout([$class: 'GitSCM', 
+          branches: [[name: '*/main']], 
+          userRemoteConfigs: [[url: 'https://github.com/Omsrrn2018/bug-tracker.git']]
+        ])
+        sh 'pwd'    // Print current directory
+        sh 'ls -R'  // Recursive listing to show full repo structure
+      }
+    }
+    stage('Unit Tests Backend') {
+      agent {
+        docker {
+          image 'snakee/golang-junit:1.21'
+          reuseNode true
+          args '-v /c/Users/bugtracker/bug-tracker/bugtracker-backend:/app' // Replace with your local backend path
+        }
+      }
+      steps {
+        dir('bugtracker-backend') {
+          sh 'ls -la'
+          sh '''
+            go test -v ./... -coverprofile=coverage.out | tee result.log | go-junit-report > report.xml
+            go tool cover -html=coverage.out -o coverage.html
+          '''
+          junit 'report.xml'
+          archiveArtifacts artifacts: 'coverage.out, coverage.html', fingerprint: true
+        }
+      }
+    }
+    stage('Unit Tests Frontend'){
+      agent{
+        docker{
+          image 'node:20-alpine'
+          reuseNode true
+        }
+      }
+      steps{
+        dir('bugtracker-frontend'){
+          sh '''
+            npm ci
+            npm run test:detectLeaks
+          '''
+        }
+      }
+      post {
+        always{
+          junit 'bugtracker-frontend/test-results.xml'
+          archiveArtifacts 'bugtracker-frontend/coverage/**'
+        }
+      }
+    }
+  }
+}
