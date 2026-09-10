@@ -1,0 +1,38 @@
+pipeline {
+    agent {
+        docker {
+            image 'snakee/golang-junit:1.21'
+            args '-v $HOME/.cache/go-build:/go/pkg/cache' // optional cache mount for faster builds
+        }
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Test with Coverage') {
+            steps {
+                sh '''
+                # Run tests with coverage and generate JUnit XML report
+                go test -v -coverprofile=coverage.out ./... | go-junit-report > test-results.xml
+
+                # Generate HTML coverage report
+                go tool cover -html=coverage.out -o coverage.html
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            // Publish JUnit test results
+            junit 'test-results.xml'
+
+            // Archive coverage report so it can be downloaded from Jenkins UI
+            archiveArtifacts artifacts: 'coverage.html', fingerprint: true
+        }
+    }
+}
