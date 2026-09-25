@@ -1,26 +1,22 @@
 pipeline {
-    agent any  // or specify a particular agent
+    agent { label 'docker-node' }  // or 'any' if your only node has Docker
 
     stages {
         stage('Launch Application') {
-            agent {
-                docker {
-                    image 'docker:27.5.1'
-                    reuseNode true
-                    args '-v /var/run/docker.sock:/var/run/docker.sock -u 0'
-                }
-            }
             steps {
-    sh 'which docker-compose'
-    sh 'docker-compose --version'
-    sh 'docker-compose up --build -d'
-}
+                sh 'docker version'
+                sh 'which docker-compose || echo "docker-compose not in PATH"'
+                sh 'docker-compose --version || echo "docker-compose missing"'
+                sh 'docker-compose up --build -d'
+            }
         }
     }
 
     post {
         always {
-            cleanWS()
+            // Use ONE of these:
+            // cleanWs()      // if Workspace Cleanup plugin installed
+            deleteDir()       // if you want to avoid extra plugins
         }
     }
 }
