@@ -1,20 +1,24 @@
 pipeline {
-    agent any
-
-    stages {
+            
         stage('Launch Application') {
             agent {
                 docker {
-                    image 'docker:27.5.0-dind'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock -u 0'
+                    image 'docker:27.5.1'
                     reuseNode true
+                    args '-v /var/run/docker.sock:/var/run/docker.sock -u 0'
                 }
             }
             steps {
-                dir('../') {  // Change directory to the project root
-                    sh 'docker-compose up --build -d'
-                }
+                sh 'docker-compose up --build -d'
             }
         }
+
+       
     }
-}
+
+    post {
+        always {
+            cleanWS()
+        }
+    }
+
