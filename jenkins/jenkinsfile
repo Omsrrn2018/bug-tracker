@@ -1,5 +1,7 @@
 pipeline {
-            
+    agent any  // or specify a particular agent
+
+    stages {
         stage('Launch Application') {
             agent {
                 docker {
@@ -12,8 +14,6 @@ pipeline {
                 sh 'docker-compose up --build -d'
             }
         }
-
-       
     }
 
     post {
@@ -21,4 +21,4 @@ pipeline {
             cleanWS()
         }
     }
-
+}
