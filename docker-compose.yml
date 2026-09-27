@@ -1,23 +1,31 @@
-version: '3.8'
-
 services:
-  jenkins:
-    image: jenkins/jenkins:lts
+  backend:
+    build:
+      context: ./bugtracker-backend
+      dockerfile: Dockerfile
+    container_name: bugtracker-backend
     ports:
       - "8080:8080"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./bugtracker-frontend
+      dockerfile: Dockerfile
+    container_name: bugtracker-frontend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8082:8080"   # New host port 8082
       - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      DOCKER_HOST: unix:///var/run/docker.sock
-
-  backend-test:
-    image: snakee/golang-junit:1.21
-    working_dir: /app
-    volumes:
-      - ./bug-tracker-backend:/app
-    command: ["go", "test", "./..."]
+    restart: unless-stopped
 
 volumes:
   jenkins_home:
