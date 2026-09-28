@@ -32,6 +32,8 @@ jobs:
          cat coverage.txt >> $GITHUB_STEP_SUMMARY
          echo '```' >> $GITHUB_STEP_SUMMARY
 
+         go test -v ./... | go-junit-report > testresults.xml
+
       - name: Publish Backend Unit Test report
         uses: dorny/test-reporter@v1
         if: always()
