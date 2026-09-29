@@ -32,13 +32,15 @@ jobs:
           cat coverage.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
+          go test -v ./... 2>&1 | go-junit-report > testresults.xml
+
       - name: Publish Backend Unit Test report
         uses: dorny/test-reporter@v1
         if: always()
         with:
          name: Backend Unit Tests reporter
          path: bugtracker-backend/test-results.xml
-         reporter: xunit
+         reporter: jest-junit
             
   unit-tests-frontend:
     needs: unit-tests-backend
