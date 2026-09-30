@@ -85,22 +85,21 @@ jobs:
 
 
   create-coverage-comment:
-     if: github.event_name == 'pull_request'
-     needs: [unit-tests-backend]
-     runs-on: ubuntu-latest
-     permissions:
-       pull-requests: write
-     steps: 
-       - name: Create Bckend Coverage comment
-         uses: peter-evans/create-or-update-comment@v4
-         with:
-           issue-number: {{ github.event.pull_request.number }}
-           body: |
-             ## Backend Test Coverage Report
-             ```
-             $ {{ needs.unit-tests-backend.outputs.coverage }}
-
-             ```
+  if: github.event_name == 'pull_request'
+  needs: [unit-tests-backend]
+  runs-on: ubuntu-latest
+  permissions:
+    pull-requests: write
+  steps:
+    - name: Create Backend Coverage comment
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          ## Backend Test Coverage Report
+          ```
+          ${{ needs.unit-tests-backend.outputs.coverage }}
+          ```
              
 
 
