@@ -4,17 +4,16 @@ on:
   push:
     branches:
       - main
-  pull request:
+  pull_request:
     branches:
-      -main
-
-  workflow_dispatch:  
+      - main
+  workflow_dispatch:
 
 jobs:
   unit-tests-backend:
     runs-on: ubuntu-latest
     outputs: 
-      coverage: ${{steps.test-backed.outputs.report}}
+      coverage: ${{steps.test-backend.outputs.report}}
     steps:
       - uses: actions/checkout@v4
 
