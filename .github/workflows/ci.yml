@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  pull request:
+    branches:
+      -main
+
+  workflow_dispatch:  
 
 jobs:
   unit-tests-backend:
