@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
   unit-tests-backend:
@@ -22,6 +22,7 @@ jobs:
         run: go install github.com/jstemmer/go-junit-report/v2@latest
 
       - name: Execute Backend Unit Tests
+        id: test-backend
         working-directory: ./bugtracker-backend
         run: |
           go test -v -coverprofile=coverage.out -covermode=atomic ./... 2>&1 | go-junit-report > test-results.xml
@@ -31,7 +32,11 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat coverage.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "report<<EOF" >> $GITHUB_OUTPUT
+          cat coverage.txt >>  $GITHUB_OUTPUT
 
+           echo "<<EOF" >> $GITHUB_OUTPUT
+           
           go test -v ./... 2>&1 | go-junit-report > testresults.xml
 
       - name: Publish Backend Unit Test report
@@ -43,7 +48,6 @@ jobs:
          reporter: jest-junit
             
   unit-tests-frontend:
-    needs: unit-tests-backend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,8 +78,16 @@ jobs:
           path: bugtracker-frontend/test-results.xml
           reporter: jest-junit
 
+api-tests:
+  needs: [unit-tests-backend,unit-tests-frontend]
+  runs-on: ubuntu-latest 
 
+  steps: 
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-
-
+    - name: Launch Application
+      run: |
+        docker compose up --build -d
+        npx wait-port http://localhost:8080/api/health -t 30000
 
