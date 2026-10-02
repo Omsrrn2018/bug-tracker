@@ -138,6 +138,22 @@ jobs:
           path: ./tests-e2e/test-results
           retention-days: 30
 
+      -  name: Upload Performance Test Results
+         if: always()
+         uses: actions/upload-artifact@v4
+         with:
+          name: perf-test-results
+          path: ./tests-perf/summary.json
+          retention-days: 30
+
+      -  name: Upload Performance HTML Report
+         if: always()
+         uses: actions/upload-artifact@v4
+         with:
+          name: perf-reprt
+          path: ./tests-perf/perf-results.html
+          retention-days: 30
+
       - name: Upload E2E Test Playwright Report
         if: always()
         uses: actions/upload-artifact@v4
